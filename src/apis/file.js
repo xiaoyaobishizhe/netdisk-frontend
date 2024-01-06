@@ -28,15 +28,20 @@ async function applyUploadChunk(identifier, chunkNumber) {
     })
     return {
         key: data.data.key,
-        formData: data.data.formData,
+        formData: {
+            "x-amz-algorithm": data.data.formData["x-amz-algorithm"],
+            "x-amz-credential": data.data.formData["x-amz-credential"],
+            "x-amz-date": data.data.formData["x-amz-date"],
+            "x-amz-signature": data.data.formData["x-amz-signature"],
+            policy: data.data.formData.policy
+        },
         uploadUrl: data.data.uploadUrl
     }
 }
 
-async function uploadChunk(url, key, formData, fileType, blob) {
+async function uploadChunk(url, key, formData, blob) {
     formData.key = key
     formData.file = blob
-    formData["Content-Type"] = fileType
     try {
         await http.post(url, formData, {
             headers: {
