@@ -3,7 +3,9 @@
 </script>
 
 <template>
-<RouterView/>
+<NMessageProvider>
+    <RouterView/>
+</NMessageProvider>
 </template>
 
 <style scoped lang="sass">

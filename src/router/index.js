@@ -10,6 +10,7 @@ export default createRouter({
             children: [
                 {path: "", component: () => import("@/views/login/LoginPanel.vue")}
             ]
-        }
+        },
+        {path: "/home", component: () => import("@/views/home/index.vue")}
     ]
 })
