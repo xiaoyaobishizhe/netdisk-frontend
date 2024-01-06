@@ -1,5 +1,7 @@
-import * as user from './user'
+import * as userApi from './user'
+import * as fileApi from './file'
 
 export {
-    user
+    userApi,
+    fileApi
 }

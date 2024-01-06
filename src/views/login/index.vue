@@ -1,17 +1,17 @@
 <script setup>
 import LoginPanel from "@/views/login/LoginPanel.vue"
 import {useRouter} from "vue-router"
-import {user} from "@/apis"
+import {userApi} from "@/apis"
 
 const router = useRouter()
 const message = useMessage()
 
 const login = (username, password) => {
-    user.login(username, password).then(res => {
+    userApi.login(username, password).then(res => {
         localStorage.setItem("token", res.data)
         router.push("/home")
     }).catch(err => {
-        message.warning(err.message)
+        message.error(err.message)
     })
 }
 
