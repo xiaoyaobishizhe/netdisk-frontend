@@ -13,7 +13,9 @@ async function sharding(identifier, filename, size) {
     return {
         chunkSize: data.data.chunkSize,
         currentChunk: data.data.currentChunk,
-        totalChunk: data.data.totalChunk
+        totalChunk: data.data.totalChunk,
+        canSecUpload: data.data.canSecUpload,
+        existSameFile: data.data.existSameFile
     }
 }
 
