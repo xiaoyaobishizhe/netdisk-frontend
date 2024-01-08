@@ -1,5 +1,5 @@
 <script setup>
-import LoginPanel from "@/views/login/LoginPanel.vue"
+import LoginPanel from "@/views/login/login-panel.vue"
 import {useRouter} from "vue-router"
 import {userApi} from "@/apis"
 

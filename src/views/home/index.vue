@@ -1,8 +1,13 @@
 <script setup>
 import {fileApi} from "@/apis"
 import {fileToMd5} from "@/utils/file"
+import Header from "@/views/home/header.vue"
+import useUserStore from "@/stores/user"
 
+const userStore = useUserStore()
 const uploadRef = ref(null)
+
+userStore.fetchUserInfo()
 
 const upload = async options => {
     const file = options.file.file
@@ -29,6 +34,7 @@ const upload = async options => {
 </script>
 
 <template>
+<Header/>
 <NUpload ref="uploadRef" :show-file-list="false" :custom-request="upload">
     <n-button>上传文件</n-button>
 </NUpload>
