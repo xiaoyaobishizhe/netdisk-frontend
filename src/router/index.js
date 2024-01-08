@@ -1,9 +1,9 @@
 import {createRouter, createWebHistory} from "vue-router"
 
-export default createRouter({
+const router = createRouter({
     history: createWebHistory(),
     routes: [
-        {path: "/", redirect: "/login"},
+        {path: "/", redirect: "/home"},
         {
             path: "/login",
             component: () => import("@/views/login/index.vue"),
@@ -14,3 +14,17 @@ export default createRouter({
         {path: "/home", component: () => import("@/views/home/index.vue")}
     ]
 })
+
+router.beforeEach((to, from) => {
+    if (to.path === "/login") {
+        return true
+    } else {
+        const token = localStorage.getItem("token")
+        if (!token) {
+            // TODO 在登录后跳转到之前的页面
+            return "/login"
+        }
+    }
+})
+
+export default router

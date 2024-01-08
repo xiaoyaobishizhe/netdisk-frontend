@@ -26,8 +26,6 @@ const upload = async options => {
         await fileApi.finishSharding(md5)
     }
 }
-
-
 </script>
 
 <template>
