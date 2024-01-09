@@ -1,4 +1,6 @@
 import axios from "axios"
+import {useRouter} from "vue-router"
+
 
 const TOKEN_KEY = "token"
 
@@ -22,6 +24,11 @@ function useJwtResponse(instance) {
         if (token) {
             localStorage.setItem(TOKEN_KEY, token)
         }
+
+        // if (res.data.code === 1006) {
+        //     const router = useRouter()
+        //     router.push("/login")
+        // }
         return res
     }, err => {
         return Promise.reject(err)

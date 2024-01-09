@@ -3,6 +3,8 @@ import {fileApi} from "@/apis"
 import {fileToMd5} from "@/utils/file"
 import Header from "@/views/home/header.vue"
 import useUserStore from "@/stores/user"
+import FileDisplay from "@/views/home/display-window.vue";
+import DisplayWindow from "@/views/home/display-window.vue";
 
 const userStore = useUserStore()
 const uploadRef = ref(null)
@@ -38,6 +40,7 @@ const upload = async options => {
 <NUpload ref="uploadRef" :show-file-list="false" :custom-request="upload">
     <n-button>上传文件</n-button>
 </NUpload>
+<DisplayWindow/>
 </template>
 
 <style scoped lang="scss">
