@@ -1,14 +1,17 @@
 <script setup>
 const props = defineProps({
+    id: {type: String, required: true},
     isFolder: {type: Boolean, required: true},
     name: {type: String, required: true},
     size: {type: String, default: "-"},
     datetime: {type: String, required: true}
 })
 const folderRef = ref(null)
+const checked = ref(false)
 
-function onSelected(checked) {
-    if (checked) {
+function onClick() {
+    checked.value = !checked.value
+    if (checked.value) {
         folderRef.value.classList.add("folder--selected")
     } else {
         folderRef.value.classList.remove("folder--selected")
@@ -22,7 +25,7 @@ function onSelected(checked) {
         <div class="wrapper">
             <NFlex class="content" :size="0" justify="space-between" align="center">
                 <div class="select">
-                    <n-checkbox size="medium" @update-checked="onSelected"/>
+                    <NCheckbox :checked="checked" :value="props.id" size="medium" @click="onClick"/>
                 </div>
                 <div class="wrapper">
                     <NFlex class="action" :size="0" justify="space-between">
