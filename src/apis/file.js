@@ -1,10 +1,11 @@
 import http from "@/utils/http"
 
-async function sharding(identifier, filename, size) {
+async function sharding(identifier, filename, size, parentId) {
     const data = await http.put("/file/sharding", {
         identifier,
         filename,
-        size
+        size,
+        parentId
     }, {
         headers: {
             "Content-Type": "application/x-www-form-urlencoded"

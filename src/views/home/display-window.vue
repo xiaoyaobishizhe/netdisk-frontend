@@ -1,26 +1,86 @@
 <script setup>
 import DisplayItem from "@/views/home/display-item.vue"
 import {fileApi} from "@/apis"
-import {formatSize} from "@/utils/file"
+import {fileToMd5, formatSize} from "@/utils/file"
 import {formatWithoutYear} from "@/utils/datetime"
+import useUserStore from "@/stores/user"
+
+const userStore = useUserStore()
+const uploadRef = ref(null)
+
+userStore.fetchUserInfo()
+const disableBackButton = computed(() => parentIds.value.length === 0)
+
+const upload = async options => {
+    const file = options.file.file
+    uploadRef.value.clear()
+    const md5 = await fileToMd5(file)
+    const {
+        chunkSize,
+        currentChunk,
+        totalChunk,
+        canSecUpload,
+        existSameFile
+    } = await fileApi.sharding(md5, file.name, file.size, parentId.value)
+    if (!existSameFile && !canSecUpload) {
+        for (let chunk = currentChunk + 1; chunk <= totalChunk; chunk++) {
+            const {key, formData, uploadUrl} = await fileApi.applyUploadChunk(md5, chunk)
+            await fileApi.uploadChunk(uploadUrl, key, formData,
+                file.slice((chunk - 1) * chunkSize, (chunk - 1) * chunkSize + chunkSize > file.size ?
+                    file.size : (chunk - 1) * chunkSize + chunkSize))
+            await fileApi.finishUploadChunk(md5, chunk)
+        }
+        await fileApi.finishSharding(md5)
+    }
+    fetchFiles(parentId.value)
+}
 
 const selectedIds = ref([])
 const files = ref([])
+const parentId = ref(null)
+const parentIds = ref([])
 
 onMounted(() => {
-    fetchFiles()
+    fetchFiles(parentId.value)
 })
 
-async function fetchFiles() {
-    files.value = await fileApi.listFiles()
+async function fetchFiles(parentId) {
+    files.value = await fileApi.listFiles(parentId)
+}
+
+async function onSelect(id) {
+    parentId.value = id
+    parentIds.value.push(id)
+    files.value = await fileApi.listFiles(id)
+}
+
+function back() {
+    parentIds.value.pop()
+    if (parentIds.value.length === 0) {
+        parentId.value = null
+        fetchFiles(null)
+    } else {
+        fetchFiles(parentIds.value[parentIds.value.length - 1])
+    }
 }
 </script>
 
 <template>
+<NUpload ref="uploadRef" :show-file-list="false" :custom-request="upload">
+    <n-button>上传文件</n-button>
+</NUpload>
+<n-button>新建文件夹</n-button>
+
+<n-button :disabled="disableBackButton" @click="back" circle>
+    <template #icon>
+        <img class="arrow" src="@/assets/images/arrow-left.png" alt="">
+    </template>
+</n-button>
 <NCheckboxGroup v-model:value="selectedIds">
     <NFlex class="display-window" align="start">
         <DisplayItem v-for="file in files" :is-folder="file.folder" :name="file.name"
-                     :datetime="formatWithoutYear(file.updateTime)" :id="file.id" :size="formatSize(file.size)"/>
+                     :datetime="formatWithoutYear(file.updateTime)" :id="file.id" :size="formatSize(file.size)"
+                     @select="onSelect"/>
     </NFlex>
 </NCheckboxGroup>
 </template>
@@ -30,5 +90,10 @@ async function fetchFiles() {
     height: 500px;
     width: 800px;
     border: 1px solid #000;
+}
+
+.arrow {
+    height: 16px;
+    width: 16px;
 }
 </style>
