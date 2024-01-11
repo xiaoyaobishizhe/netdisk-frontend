@@ -1,14 +1,24 @@
 <script setup>
 import DisplayItem from "@/views/home/display-item.vue"
+import {fileApi} from "@/apis"
 
 const selectedIds = ref([])
+const files = ref([])
+
+onMounted(() => {
+    fetchFiles()
+})
+
+async function fetchFiles() {
+    files.value = await fileApi.listFiles()
+}
 </script>
 
 <template>
 <NCheckboxGroup v-model:value="selectedIds">
     <NFlex class="display-window" align="start">
-        <DisplayItem :is-folder="true" name="我的资源" datetime="2024-01-09 18:35" id="1"/>
-        <DisplayItem :is-folder="false" name="文本文件.txt" size="4KB" datetime="2024-01-09 18:35" id="2"/>
+        <DisplayItem v-for="file in files" :is-folder="file.isFolder" :name="file.name"
+                     :datetime="file.updateTime" :id="file.id"/>
     </NFlex>
 </NCheckboxGroup>
 </template>

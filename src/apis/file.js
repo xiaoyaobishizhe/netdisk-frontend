@@ -76,10 +76,22 @@ async function finishSharding(identifier) {
     })
 }
 
+async function listFiles(parentId) {
+    const params = {}
+    if (parentId) {
+        params.parentId = parentId
+    }
+    const data = await http.get("/file/list", {
+        params
+    })
+    return data.data.files
+}
+
 export {
     sharding,
     applyUploadChunk,
     uploadChunk,
     finishUploadChunk,
-    finishSharding
+    finishSharding,
+    listFiles
 }
