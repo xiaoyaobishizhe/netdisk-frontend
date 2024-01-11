@@ -1,6 +1,8 @@
 <script setup>
 import DisplayItem from "@/views/home/display-item.vue"
 import {fileApi} from "@/apis"
+import {formatSize} from "@/utils/file"
+import {formatWithoutYear} from "@/utils/datetime"
 
 const selectedIds = ref([])
 const files = ref([])
@@ -17,8 +19,8 @@ async function fetchFiles() {
 <template>
 <NCheckboxGroup v-model:value="selectedIds">
     <NFlex class="display-window" align="start">
-        <DisplayItem v-for="file in files" :is-folder="file.isFolder" :name="file.name"
-                     :datetime="file.updateTime" :id="file.id"/>
+        <DisplayItem v-for="file in files" :is-folder="file.folder" :name="file.name"
+                     :datetime="formatWithoutYear(file.updateTime)" :id="file.id" :size="formatSize(file.size)"/>
     </NFlex>
 </NCheckboxGroup>
 </template>
