@@ -40,8 +40,10 @@ async function uploadFile(options) {
             await fileApi.finishUploadChunk(md5, chunk)
         }
         await fileApi.finishSharding(md5)
+        await fetchFiles(parentId.value)
+    } else if (canSecUpload) {
+        await fetchFiles(parentId.value)
     }
-    await fetchFiles(parentId.value)
 }
 
 function back() {

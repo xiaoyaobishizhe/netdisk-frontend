@@ -1,5 +1,4 @@
 <script setup>
-
 const props = defineProps({
     id: {type: String, required: true},
     isFolder: {type: Boolean, required: true},
@@ -8,7 +7,6 @@ const props = defineProps({
     datetime: {type: String, required: true}
 })
 const emits = defineEmits(["select"])
-
 const folderRef = ref(null)
 const checked = ref(false)
 
@@ -20,8 +18,6 @@ function onClick() {
         folderRef.value.classList.remove("folder--selected")
     }
 }
-
-
 </script>
 
 <template>
