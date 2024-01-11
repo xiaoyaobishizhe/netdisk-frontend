@@ -88,11 +88,23 @@ async function listFiles(parentId) {
     return data.data.files
 }
 
+async function createFolder(parentId, folderName) {
+    await http.put("/file/folder", {
+        parentId,
+        folderName
+    }, {
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+        }
+    })
+}
+
 export {
     sharding,
     applyUploadChunk,
     uploadChunk,
     finishUploadChunk,
     finishSharding,
-    listFiles
+    listFiles,
+    createFolder
 }
