@@ -14,6 +14,7 @@ const selectedIds = ref([])
 const newFolderName = ref("")
 
 async function enterFolder(id) {
+    selectedIds.value = []
     parentIds.value.push(id)
     files.value = await fileApi.listFiles(id)
 }
@@ -49,6 +50,7 @@ async function uploadFile(options) {
 }
 
 function back() {
+    selectedIds.value = []
     parentIds.value.pop()
     fetchFiles(parentId.value)
 }
@@ -94,7 +96,7 @@ onMounted(() => {
     <NCheckboxGroup class="explorer__display" v-model:value="selectedIds">
         <NScrollbar>
             <NFlex align="start">
-                <Item v-for="file in files" :is-folder="file.folder" :name="file.name"
+                <Item v-for="file in files" :key="file.id" :is-folder="file.folder" :name="file.name"
                       :datetime="formatWithoutYear(file.updateTime)" :id="file.id" :size="formatSize(file.size)"
                       @select="enterFolder"/>
             </NFlex>
