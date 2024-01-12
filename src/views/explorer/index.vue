@@ -3,12 +3,15 @@ import Item from "@/views/explorer/item.vue"
 import {fileApi} from "@/apis"
 import {fileToMd5, formatSize} from "@/utils/file"
 import {formatWithoutYear} from "@/utils/datetime"
+import {NInput} from "naive-ui"
 
+const dialog = useDialog()
 const parentIds = ref([])
 const parentId = computed(() => parentIds.value.length === 0 ? null : parentIds.value[parentIds.value.length - 1])
 const files = ref([])
 const uploadRef = ref(null)
 const selectedIds = ref([])
+const newFolderName = ref("")
 
 async function enterFolder(id) {
     parentIds.value.push(id)
@@ -51,8 +54,23 @@ function back() {
 }
 
 async function createFolder() {
-    await fileApi.createFolder(parentId.value, "新建文件夹")
-    await fetchFiles(parentId.value)
+    newFolderName.value = ""
+    dialog.create({
+        showIcon: false,
+        closable: false,
+        title: "新建文件夹",
+        content: () => h(NInput, {
+            placeholder: "请输入文件夹名称",
+            autofocus: true,
+            onInput: value => newFolderName.value = value
+        }),
+        negativeText: "取消",
+        positiveText: "创建",
+        onPositiveClick: async () => {
+            await fileApi.createFolder(parentId.value, newFolderName.value ? newFolderName.value : "新建文件夹")
+            await fetchFiles(parentId.value)
+        }
+    })
 }
 
 onMounted(() => {

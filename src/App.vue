@@ -3,9 +3,11 @@
 </script>
 
 <template>
-<NMessageProvider>
-    <RouterView/>
-</NMessageProvider>
+<NDialogProvider>
+    <NMessageProvider>
+        <RouterView/>
+    </NMessageProvider>
+</NDialogProvider>
 </template>
 
 <style scoped lang="sass">
