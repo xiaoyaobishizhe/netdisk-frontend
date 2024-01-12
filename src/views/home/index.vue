@@ -11,6 +11,7 @@ const asideItemActive = ref(0)
 
 const handleAsideItemClick = (index) => {
     asideItemActive.value = index
+    router.push(asideItem[index].path)
 }
 </script>
 
