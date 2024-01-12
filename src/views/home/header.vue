@@ -4,6 +4,8 @@ import useUserStore from "@/stores/user"
 
 const userStore = useUserStore()
 const {userInfo} = storeToRefs(userStore)
+
+userStore.fetchUserInfo()
 </script>
 
 <template>
@@ -26,8 +28,7 @@ const {userInfo} = storeToRefs(userStore)
     display: flex;
     align-items: center;
     justify-content: space-between;
-    height: 4em;
-    box-shadow: 0 2px 6px 0 rgba(0, 0, 0, .05);
+    height: 100%;
     padding: 0 1em;
 
     &__banner {

@@ -11,7 +11,13 @@ const router = createRouter({
                 {path: "", component: () => import("@/views/login/login-panel.vue")}
             ]
         },
-        {path: "/home", component: () => import("@/views/home/index.vue")}
+        {
+            path: "/home",
+            component: () => import("@/views/home/index.vue"),
+            children: [
+                {path: "", component: () => import("@/views/explorer/index.vue")}
+            ]
+        }
     ]
 })
 
