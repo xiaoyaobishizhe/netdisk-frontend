@@ -1,8 +1,7 @@
 <script setup>
-import Item from "@/views/explorer/item.vue"
+import ResourceItem from "@/views/explorer/resource-item.vue"
 import {fileApi} from "@/apis"
-import {fileToMd5, formatSize} from "@/utils/file"
-import {formatWithoutYear} from "@/utils/datetime"
+import {fileToMd5} from "@/utils/file"
 import {NInput} from "naive-ui"
 
 const dialog = useDialog()
@@ -82,7 +81,7 @@ onMounted(() => {
 
 <template>
 <div class="explorer">
-    <NFlex class="explorer__action" :wrap="false" align="center">
+    <NFlex class="action" :wrap="false" align="center">
         <NButton secondary type="info" :disabled="!parentId" @click="back" circle>
             <template #icon><img class="arrow" src="@/assets/images/arrow-left.png" alt=""></template>
         </NButton>
@@ -93,12 +92,11 @@ onMounted(() => {
         </div>
         <NButton @click="createFolder" type="info" round>新建文件夹</NButton>
     </NFlex>
-    <NCheckboxGroup class="explorer__display" v-model:value="selectedIds">
+    <NCheckboxGroup class="display" v-model:value="selectedIds">
         <NScrollbar>
             <NFlex align="start">
-                <Item v-for="file in files" :key="file.id" :is-folder="file.folder" :name="file.name"
-                      :datetime="formatWithoutYear(file.updateTime)" :id="file.id" :size="formatSize(file.size)"
-                      @select="enterFolder"/>
+                <resource-item v-for="file in files" :key="file.id" :is-folder="file.folder" :name="file.name"
+                               :id="file.id" @clickResource="enterFolder"/>
             </NFlex>
         </NScrollbar>
     </NCheckboxGroup>
@@ -111,11 +109,11 @@ onMounted(() => {
     width: 100%;
     $action-height: 50px;
 
-    &__action {
+    .action {
         height: $action-height;
     }
 
-    &__display {
+    .display {
         height: calc(100% - #{$action-height});
     }
 }
