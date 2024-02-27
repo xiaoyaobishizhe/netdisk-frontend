@@ -1,8 +1,8 @@
 <script setup>
-import ResourceItem from "@/views/explorer/resource-item.vue"
 import {fileApi} from "@/apis"
 import {fileToMd5} from "@/utils/file"
 import {NInput} from "naive-ui"
+import ResourceDisplayWindow from "@/components/resource/resource-display-window.vue"
 
 const dialog = useDialog()
 const parentIds = ref([])
@@ -12,14 +12,25 @@ const uploadRef = ref(null)
 const selectedIds = ref([])
 const newFolderName = ref("")
 
-async function enterFolder(id) {
-    selectedIds.value = []
-    parentIds.value.push(id)
-    files.value = await fileApi.listFiles(id)
-}
-
 async function fetchFiles(parentId) {
     files.value = await fileApi.listFiles(parentId)
+}
+
+async function enterFolder(id) {
+    for (const file of files.value) {
+        if (file.id === id && file.folder) {
+            selectedIds.value = []
+            parentIds.value.push(id)
+            await fetchFiles(parentId.value)
+            break
+        }
+    }
+}
+
+async function back() {
+    selectedIds.value = []
+    parentIds.value.pop()
+    await fetchFiles(parentId.value)
 }
 
 async function uploadFile(options) {
@@ -48,12 +59,6 @@ async function uploadFile(options) {
     }
 }
 
-function back() {
-    selectedIds.value = []
-    parentIds.value.pop()
-    fetchFiles(parentId.value)
-}
-
 async function createFolder() {
     newFolderName.value = ""
     dialog.create({
@@ -74,6 +79,28 @@ async function createFolder() {
     })
 }
 
+function selectAll() {
+    const targetIds = []
+    for (let file of files.value) {
+        targetIds.push(file.id)
+    }
+    selectedIds.value = targetIds
+}
+
+function reverseSelect() {
+    const targetIds = []
+    for (let file of files.value) {
+        if (!selectedIds.value.includes(file.id)) {
+            targetIds.push(file.id)
+        }
+    }
+    selectedIds.value = targetIds
+}
+
+function cancelSelect() {
+    selectedIds.value = []
+}
+
 onMounted(() => {
     fetchFiles(parentId.value)
 })
@@ -81,25 +108,27 @@ onMounted(() => {
 
 <template>
 <div class="explorer">
-    <NFlex class="action" :wrap="false" align="center">
-        <NButton secondary type="info" :disabled="!parentId" @click="back" circle>
+    <n-flex class="action" :wrap="false" align="center">
+        <n-button secondary type="info" :disabled="!parentId" @click="back" circle>
             <template #icon><img class="arrow" src="@/assets/images/arrow-left.png" alt=""></template>
-        </NButton>
+        </n-button>
         <div>
-            <NUpload ref="uploadRef" :show-file-list="false" :custom-request="uploadFile">
-                <NButton type="info" round>上传文件</NButton>
-            </NUpload>
+            <n-upload ref="uploadRef" :show-file-list="false" :custom-request="uploadFile">
+                <n-button type="info" round>上传文件</n-button>
+            </n-upload>
         </div>
-        <NButton @click="createFolder" type="info" round>新建文件夹</NButton>
-    </NFlex>
-    <NCheckboxGroup class="display" v-model:value="selectedIds">
-        <NScrollbar>
-            <NFlex align="start">
-                <resource-item v-for="file in files" :key="file.id" :is-folder="file.folder" :name="file.name"
-                               :id="file.id" @clickResource="enterFolder"/>
-            </NFlex>
-        </NScrollbar>
-    </NCheckboxGroup>
+        <n-button @click="createFolder" type="info" round>新建文件夹</n-button>
+        <n-button @click="selectAll" type="info" round>全选</n-button>
+        <n-button v-if="selectedIds.length > 0" @click="reverseSelect" type="info" round>反选</n-button>
+        <n-button v-if="selectedIds.length > 0" @click="cancelSelect" type="info" round>取消</n-button>
+        <n-button v-if="selectedIds.length > 0" type="info" round>复制</n-button>
+        <n-button v-if="selectedIds.length > 0" type="info" round>移动</n-button>
+        <n-button v-if="selectedIds.length > 0" type="info" round>删除</n-button>
+    </n-flex>
+    <div class="display">
+        <resource-display-window :click-resource-callback="enterFolder" :files="files"
+                                 v-model:selected-ids="selectedIds"/>
+    </div>
 </div>
 </template>
 
@@ -111,15 +140,15 @@ onMounted(() => {
 
     .action {
         height: $action-height;
+
+        .arrow {
+            height: 16px;
+            width: 16px;
+        }
     }
 
     .display {
         height: calc(100% - #{$action-height});
     }
-}
-
-.arrow {
-    height: 16px;
-    width: 16px;
 }
 </style>
