@@ -88,6 +88,28 @@ async function listFiles(parentId) {
     return data.data.files
 }
 
+async function listFolders(parentId) {
+    const params = {}
+    if (parentId) {
+        params.parentId = parentId
+    }
+    const data = await http.get("/file/list-folder", {
+        params
+    })
+    return data.data.folders
+}
+
+async function copy(ids, parentId) {
+    await http.post("/file/copy", {
+        ids,
+        parentId
+    }, {
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+        }
+    })
+}
+
 async function createFolder(parentId, folderName) {
     await http.put("/file/folder", {
         parentId,
@@ -106,5 +128,7 @@ export {
     finishUploadChunk,
     finishSharding,
     listFiles,
-    createFolder
+    createFolder,
+    listFolders,
+    copy
 }

@@ -10,6 +10,11 @@ const files = ref([])
 const selectedIds = ref([])
 const uploadRef = ref(null)
 const newFolderName = ref("")
+const panelShow = ref(false)
+const panelParentIds = ref([])
+const panelParentId = computed(() => panelParentIds.value.length === 0 ? null : panelParentIds.value[panelParentIds.value.length - 1])
+const panelFolders = ref([])
+const panelFolderPath = ref([])
 
 async function fetchFiles(parentId) {
     selectedIds.value = []
@@ -99,6 +104,35 @@ function cancelSelect() {
     selectedIds.value = []
 }
 
+function handleCopy() {
+    panelShow.value = true
+}
+
+async function handleClickPanelFolder(id, name) {
+    panelParentIds.value.push(id)
+    panelFolderPath.value.push(name)
+    panelFolders.value = await fileApi.listFolders(panelParentId.value)
+}
+
+async function handlePanelBack() {
+    panelParentIds.value.pop()
+    panelFolderPath.value.pop()
+    panelFolders.value = await fileApi.listFolders(panelParentId.value)
+}
+
+async function copy() {
+    await fileApi.copy(selectedIds.value.join(","), panelParentId.value)
+    panelShow.value = false
+}
+
+watch(panelShow, async (value) => {
+    if (value) {
+        panelParentIds.value = []
+        panelFolderPath.value = []
+        panelFolders.value = await fileApi.listFolders(panelParentId.value)
+    }
+})
+
 onMounted(() => {
     fetchFiles(parentId.value)
 })
@@ -106,6 +140,31 @@ onMounted(() => {
 
 <template>
 <div class="explorer">
+    <n-modal class="folder-panel" v-model:show="panelShow">
+        <n-card title="复制到" closable @close="panelShow = false">
+            <div class="folder-list">
+                <n-flex class="path" align="center">
+                    <n-button text v-if="panelParentId" @click="handlePanelBack">返回上一级</n-button>
+                    根路径
+                    <div v-for="path in panelFolderPath">/ {{path}}</div>
+                </n-flex>
+                <n-scrollbar>
+                    <n-flex :vertical="true" :size="0">
+                        <n-flex class="folder" align="center" :size="0"
+                                @click="handleClickPanelFolder(folder.id, folder.name)"
+                                v-for="folder in panelFolders" :key="folder.id">
+                            <img src="@/assets/images/folder.png" alt=""/>
+                            {{folder.name}}
+                        </n-flex>
+                    </n-flex>
+                </n-scrollbar>
+            </div>
+            <template #footer>
+                <n-button round @click="panelShow = false">取消</n-button>
+                <n-button type="info" round @click="copy">复制到此</n-button>
+            </template>
+        </n-card>
+    </n-modal>
     <n-flex class="action" :wrap="false" align="center">
         <n-button secondary type="info" :disabled="!parentId" @click="back" circle>
             <template #icon><img class="arrow" src="@/assets/images/arrow-left.png" alt=""></template>
@@ -119,7 +178,7 @@ onMounted(() => {
         <n-button @click="selectAll" type="info" round>全选</n-button>
         <n-button v-if="selectedIds.length > 0" @click="reverseSelect" type="info" round>反选</n-button>
         <n-button v-if="selectedIds.length > 0" @click="cancelSelect" type="info" round>取消</n-button>
-        <n-button v-if="selectedIds.length > 0" type="info" round>复制</n-button>
+        <n-button v-if="selectedIds.length > 0" type="info" round @click="handleCopy">复制</n-button>
         <n-button v-if="selectedIds.length > 0" type="info" round>移动</n-button>
         <n-button v-if="selectedIds.length > 0" type="info" round>删除</n-button>
     </n-flex>
@@ -150,6 +209,37 @@ onMounted(() => {
 </template>
 
 <style scoped lang="scss">
+.folder-panel {
+    width: 720px;
+    border-radius: 12px;
+
+    .folder-list {
+        height: 320px;
+
+        .path {
+            height: 40px;
+            background-color: #fafafc;
+            font-size: 12px;
+        }
+
+        .folder {
+            height: 50px;
+            font-size: 12px;
+            color: #03081a;
+            user-select: none;
+            cursor: pointer;
+
+            &:hover {
+                background-color: #f7f9fc;
+            }
+
+            img {
+                height: 40px;
+            }
+        }
+    }
+}
+
 .explorer {
     height: 100%;
     width: 100%;
