@@ -11,6 +11,7 @@ const selectedIds = ref([])
 const uploadRef = ref(null)
 const newFolderName = ref("")
 const panelShow = ref(false)
+const panelType = ref("")
 const panelParentIds = ref([])
 const panelParentId = computed(() => panelParentIds.value.length === 0 ? null : panelParentIds.value[panelParentIds.value.length - 1])
 const panelFolders = ref([])
@@ -105,6 +106,7 @@ function cancelSelect() {
 }
 
 function handleCopy() {
+    panelType.value = "复制"
     panelShow.value = true
 }
 
@@ -120,12 +122,23 @@ async function handlePanelBack() {
     panelFolders.value = await fileApi.listFolders(panelParentId.value)
 }
 
-async function copy() {
-    await fileApi.copy(selectedIds.value.join(","), panelParentId.value)
+async function panelConfirm() {
+    if (panelType.value === "复制") {
+        await fileApi.copy(selectedIds.value.join(","), panelParentId.value)
+    } else {
+        await fileApi.move(selectedIds.value.join(","), panelParentId.value)
+    }
     panelShow.value = false
+    await fetchFiles(parentId.value)
+}
+
+async function handleClickMove() {
+    panelType.value = "移动"
+    panelShow.value = true
 }
 
 watch(panelShow, async (value) => {
+    // 面板弹出时自动清除内容并刷新内容
     if (value) {
         panelParentIds.value = []
         panelFolderPath.value = []
@@ -141,7 +154,7 @@ onMounted(() => {
 <template>
 <div class="explorer">
     <n-modal class="folder-panel" v-model:show="panelShow">
-        <n-card title="复制到" closable @close="panelShow = false">
+        <n-card :title="panelType + '到'" closable @close="panelShow = false">
             <div class="folder-list">
                 <n-flex class="path" align="center">
                     <n-button text v-if="panelParentId" @click="handlePanelBack">返回上一级</n-button>
@@ -161,7 +174,7 @@ onMounted(() => {
             </div>
             <template #footer>
                 <n-button round @click="panelShow = false">取消</n-button>
-                <n-button type="info" round @click="copy">复制到此</n-button>
+                <n-button type="info" round @click="panelConfirm">{{panelType}}到此</n-button>
             </template>
         </n-card>
     </n-modal>
@@ -179,7 +192,7 @@ onMounted(() => {
         <n-button v-if="selectedIds.length > 0" @click="reverseSelect" type="info" round>反选</n-button>
         <n-button v-if="selectedIds.length > 0" @click="cancelSelect" type="info" round>取消</n-button>
         <n-button v-if="selectedIds.length > 0" type="info" round @click="handleCopy">复制</n-button>
-        <n-button v-if="selectedIds.length > 0" type="info" round>移动</n-button>
+        <n-button v-if="selectedIds.length > 0" type="info" round @click="handleClickMove">移动</n-button>
         <n-button v-if="selectedIds.length > 0" type="info" round>删除</n-button>
     </n-flex>
     <n-checkbox-group class="checkbox" v-model:value="selectedIds">

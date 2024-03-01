@@ -110,6 +110,17 @@ async function copy(ids, parentId) {
     })
 }
 
+async function move(ids, parentId) {
+    await http.post("/file/move", {
+        ids,
+        parentId
+    }, {
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+        }
+    })
+}
+
 async function createFolder(parentId, folderName) {
     await http.put("/file/folder", {
         parentId,
@@ -130,5 +141,6 @@ export {
     listFiles,
     createFolder,
     listFolders,
-    copy
+    copy,
+    move
 }
