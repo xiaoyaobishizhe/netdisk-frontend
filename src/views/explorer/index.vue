@@ -137,6 +137,12 @@ async function handleClickMove() {
     panelShow.value = true
 }
 
+async function handleClickDelete() {
+    await fileApi.deleteFile(selectedIds.value.join(","))
+    selectedIds.value = []
+    await fetchFiles(parentId.value)
+}
+
 watch(panelShow, async (value) => {
     // 面板弹出时自动清除内容并刷新内容
     if (value) {
@@ -193,7 +199,7 @@ onMounted(() => {
         <n-button v-if="selectedIds.length > 0" @click="cancelSelect" type="info" round>取消</n-button>
         <n-button v-if="selectedIds.length > 0" type="info" round @click="handleCopy">复制</n-button>
         <n-button v-if="selectedIds.length > 0" type="info" round @click="handleClickMove">移动</n-button>
-        <n-button v-if="selectedIds.length > 0" type="info" round>删除</n-button>
+        <n-button v-if="selectedIds.length > 0" type="info" round @click="handleClickDelete">删除</n-button>
     </n-flex>
     <n-checkbox-group class="checkbox" v-model:value="selectedIds">
         <n-scrollbar>

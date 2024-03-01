@@ -121,6 +121,16 @@ async function move(ids, parentId) {
     })
 }
 
+async function deleteFile(ids) {
+    await http.post("/file/delete", {
+        ids
+    }, {
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+        }
+    })
+}
+
 async function createFolder(parentId, folderName) {
     await http.put("/file/folder", {
         parentId,
@@ -142,5 +152,6 @@ export {
     createFolder,
     listFolders,
     copy,
-    move
+    move,
+    deleteFile
 }
