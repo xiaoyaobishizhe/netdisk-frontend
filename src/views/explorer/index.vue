@@ -9,7 +9,7 @@ const parentId = computed(() => parentIds.value.length === 0 ? null : parentIds.
 const files = ref([])
 const selectedIds = ref([])
 const uploadRef = ref(null)
-const newFolderName = ref("")
+const newName = ref("")
 const panelShow = ref(false)
 const panelType = ref("")
 const panelParentIds = ref([])
@@ -64,7 +64,7 @@ async function uploadFile(options) {
 }
 
 async function createFolder() {
-    newFolderName.value = ""
+    newName.value = ""
     dialog.create({
         showIcon: false,
         closable: false,
@@ -72,12 +72,12 @@ async function createFolder() {
         content: () => h(NInput, {
             placeholder: "请输入文件夹名称",
             autofocus: true,
-            onInput: value => newFolderName.value = value
+            onInput: value => newName.value = value
         }),
         negativeText: "取消",
         positiveText: "创建",
         onPositiveClick: async () => {
-            await fileApi.createFolder(parentId.value, newFolderName.value ? newFolderName.value : "新建文件夹")
+            await fileApi.createFolder(parentId.value, newName.value ? newName.value : "新建文件夹")
             await fetchFiles(parentId.value)
         }
     })
@@ -135,6 +135,26 @@ async function panelConfirm() {
 async function handleClickMove() {
     panelType.value = "移动"
     panelShow.value = true
+}
+
+async function handleClickRename() {
+    newName.value = ""
+    dialog.create({
+        showIcon: false,
+        closable: false,
+        title: "重命名",
+        content: () => h(NInput, {
+            placeholder: "请输入新名称",
+            autofocus: true,
+            onInput: value => newName.value = value
+        }),
+        negativeText: "取消",
+        positiveText: "确定",
+        onPositiveClick: async () => {
+            await fileApi.rename(selectedIds.value.pop(), newName.value)
+            await fetchFiles(parentId.value)
+        }
+    })
 }
 
 async function handleClickDelete() {
@@ -197,6 +217,7 @@ onMounted(() => {
         <n-button @click="selectAll" type="info" round>全选</n-button>
         <n-button v-if="selectedIds.length > 0" @click="reverseSelect" type="info" round>反选</n-button>
         <n-button v-if="selectedIds.length > 0" @click="cancelSelect" type="info" round>取消</n-button>
+        <n-button v-if="selectedIds.length === 1" @click="handleClickRename" type="info" round>重命名</n-button>
         <n-button v-if="selectedIds.length > 0" type="info" round @click="handleCopy">复制</n-button>
         <n-button v-if="selectedIds.length > 0" type="info" round @click="handleClickMove">移动</n-button>
         <n-button v-if="selectedIds.length > 0" type="info" round @click="handleClickDelete">删除</n-button>

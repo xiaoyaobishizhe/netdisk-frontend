@@ -142,6 +142,17 @@ async function createFolder(parentId, folderName) {
     })
 }
 
+async function rename(id, name) {
+    await http.post("/file/rename", {
+        id,
+        name
+    }, {
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+        }
+    })
+}
+
 export {
     sharding,
     applyUploadChunk,
@@ -153,5 +164,6 @@ export {
     listFolders,
     copy,
     move,
-    deleteFile
+    deleteFile,
+    rename
 }
