@@ -1,11 +1,13 @@
 <script setup>
 import Header from "@/views/home/header.vue"
 import iconImg from "@/assets/images/icon.png"
+import RecycleBinImg from "@/assets/images/recycle-bin.png"
 import {useRouter} from "vue-router"
 
 const router = useRouter()
 const asideItem = [
-    {icon: iconImg, title: "首页", path: "/home/explorer"}
+    {icon: iconImg, title: "首页", path: "/home/explorer"},
+    {icon: RecycleBinImg, title: "回收站", path: "/home/recycle-bin"}
 ]
 const asideItemActive = ref(0)
 
