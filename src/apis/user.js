@@ -11,8 +11,13 @@ async function login(username, password) {
     })
 }
 
-async function info() {
-    return await http.get('/user')
+async function info(id) {
+    const data = await http.get('/user', {
+        params: {
+            id
+        }
+    })
+    return data.data
 }
 
 export {

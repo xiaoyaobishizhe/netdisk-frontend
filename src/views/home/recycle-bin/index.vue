@@ -1,5 +1,5 @@
 <script setup>
-import {recycleBinApi} from "@/apis"
+import {recycleBinApi} from "@/apis/index.js"
 
 const columns = [
     {type: "selection"},

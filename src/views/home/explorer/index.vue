@@ -1,7 +1,9 @@
 <script setup>
-import {fileApi} from "@/apis"
-import {fileToMd5} from "@/utils/file"
+import {fileApi} from "@/apis/index.js"
+import {fileToMd5} from "@/utils/file/index.js"
 import {NInput} from "naive-ui"
+import ShareModal from "@/views/home/explorer/share-modal.vue"
+import FolderModal from "@/views/home/explorer/folder-modal.vue"
 
 const dialog = useDialog()
 const parentIds = ref([])
@@ -10,12 +12,9 @@ const files = ref([])
 const selectedIds = ref([])
 const uploadRef = ref(null)
 const newName = ref("")
-const panelShow = ref(false)
-const panelType = ref("")
-const panelParentIds = ref([])
-const panelParentId = computed(() => panelParentIds.value.length === 0 ? null : panelParentIds.value[panelParentIds.value.length - 1])
-const panelFolders = ref([])
-const panelFolderPath = ref([])
+const folderModelRef = ref()       // 文件夹模态框的引用
+const folderModelType = ref("")    // 文件夹模态框的类型
+const shareModelRef = ref()        // 分享模态框的引用
 
 async function fetchFiles(parentId) {
     selectedIds.value = []
@@ -105,36 +104,19 @@ function cancelSelect() {
     selectedIds.value = []
 }
 
-function handleCopy() {
-    panelType.value = "复制"
-    panelShow.value = true
+function handleClickCopy() {
+    folderModelType.value = "复制"
+    folderModelRef.value.setShow(true)
 }
 
-async function handleClickPanelFolder(id, name) {
-    panelParentIds.value.push(id)
-    panelFolderPath.value.push(name)
-    panelFolders.value = await fileApi.listFolders(panelParentId.value)
+function handleClickMove() {
+    folderModelType.value = "移动"
+    folderModelRef.value.setShow(true)
 }
 
-async function handlePanelBack() {
-    panelParentIds.value.pop()
-    panelFolderPath.value.pop()
-    panelFolders.value = await fileApi.listFolders(panelParentId.value)
-}
-
-async function panelConfirm() {
-    if (panelType.value === "复制") {
-        await fileApi.copy(selectedIds.value.join(","), panelParentId.value)
-    } else {
-        await fileApi.move(selectedIds.value.join(","), panelParentId.value)
-    }
-    panelShow.value = false
+async function onFolderModalClose() {
+    // 文件夹模态框关闭时刷新当前文件列表
     await fetchFiles(parentId.value)
-}
-
-async function handleClickMove() {
-    panelType.value = "移动"
-    panelShow.value = true
 }
 
 async function handleClickRename() {
@@ -163,14 +145,9 @@ async function handleClickDelete() {
     await fetchFiles(parentId.value)
 }
 
-watch(panelShow, async (value) => {
-    // 面板弹出时自动清除内容并刷新内容
-    if (value) {
-        panelParentIds.value = []
-        panelFolderPath.value = []
-        panelFolders.value = await fileApi.listFolders(panelParentId.value)
-    }
-})
+async function handleClickShare() {
+    shareModelRef.value.setShowPanel(true)
+}
 
 onMounted(() => {
     fetchFiles(parentId.value)
@@ -179,34 +156,11 @@ onMounted(() => {
 
 <template>
 <div class="explorer">
-    <n-modal class="folder-panel" v-model:show="panelShow">
-        <n-card :title="panelType + '到'" closable @close="panelShow = false">
-            <div class="folder-list">
-                <n-flex class="path" align="center">
-                    <n-button text v-if="panelParentId" @click="handlePanelBack">返回上一级</n-button>
-                    根路径
-                    <div v-for="path in panelFolderPath">/ {{path}}</div>
-                </n-flex>
-                <n-scrollbar>
-                    <n-flex :vertical="true" :size="0">
-                        <n-flex class="folder" align="center" :size="0"
-                                @click="handleClickPanelFolder(folder.id, folder.name)"
-                                v-for="folder in panelFolders" :key="folder.id">
-                            <img src="@/assets/images/folder.png" alt=""/>
-                            {{folder.name}}
-                        </n-flex>
-                    </n-flex>
-                </n-scrollbar>
-            </div>
-            <template #footer>
-                <n-button round @click="panelShow = false">取消</n-button>
-                <n-button type="info" round @click="panelConfirm">{{panelType}}到此</n-button>
-            </template>
-        </n-card>
-    </n-modal>
+    <folder-modal ref="folderModelRef" :selected-ids="selectedIds" :type="folderModelType" @close="onFolderModalClose"/>
+    <share-modal ref="shareModelRef" :selected-ids="selectedIds"/>
     <n-flex class="action" :wrap="false" align="center">
         <n-button secondary type="info" :disabled="!parentId" @click="back" circle>
-            <template #icon><img class="arrow" src="@/assets/images/arrow-left.png" alt=""></template>
+            <template #icon><img class="arrow" src="../../../assets/images/arrow-left.png" alt=""></template>
         </n-button>
         <div>
             <n-upload ref="uploadRef" :show-file-list="false" :custom-request="uploadFile">
@@ -217,8 +171,9 @@ onMounted(() => {
         <n-button @click="selectAll" type="info" round>全选</n-button>
         <n-button v-if="selectedIds.length > 0" @click="reverseSelect" type="info" round>反选</n-button>
         <n-button v-if="selectedIds.length > 0" @click="cancelSelect" type="info" round>取消</n-button>
+        <n-button v-if="selectedIds.length > 0" @click="handleClickShare" type="info" round>分享</n-button>
         <n-button v-if="selectedIds.length === 1" @click="handleClickRename" type="info" round>重命名</n-button>
-        <n-button v-if="selectedIds.length > 0" type="info" round @click="handleCopy">复制</n-button>
+        <n-button v-if="selectedIds.length > 0" type="info" round @click="handleClickCopy">复制</n-button>
         <n-button v-if="selectedIds.length > 0" type="info" round @click="handleClickMove">移动</n-button>
         <n-button v-if="selectedIds.length > 0" type="info" round @click="handleClickDelete">删除</n-button>
     </n-flex>
@@ -249,37 +204,6 @@ onMounted(() => {
 </template>
 
 <style scoped lang="scss">
-.folder-panel {
-    width: 720px;
-    border-radius: 12px;
-
-    .folder-list {
-        height: 320px;
-
-        .path {
-            height: 40px;
-            background-color: #fafafc;
-            font-size: 12px;
-        }
-
-        .folder {
-            height: 50px;
-            font-size: 12px;
-            color: #03081a;
-            user-select: none;
-            cursor: pointer;
-
-            &:hover {
-                background-color: #f7f9fc;
-            }
-
-            img {
-                height: 40px;
-            }
-        }
-    }
-}
-
 .explorer {
     height: 100%;
     width: 100%;
