@@ -1,6 +1,7 @@
 <script setup>
 import {useRoute} from "vue-router"
-import {fileApi, shareApi} from "@/apis"
+import {shareApi} from "@/apis"
+import FolderModal from "@/views/home/explorer/folder-modal.vue"
 
 const route = useRoute()
 const code = route.params.code
@@ -9,6 +10,7 @@ const files = ref([])
 const parentIds = ref([])
 const parentId = computed(() => parentIds.value.length === 0 ? null : parentIds.value[parentIds.value.length - 1])
 const selectedIds = ref([])
+const folderModalRef = ref()
 
 async function fetchFiles(parentId) {
     selectedIds.value = []
@@ -53,16 +55,22 @@ async function handleClickResource(id) {
 }
 
 async function handleClickSave() {
+    folderModalRef.value.setShow(true)
+}
 
+async function onFolderModalClose() {
+    await fetchFiles(parentId.value)
 }
 
 onMounted(async () => {
-    fetchFiles(parentId.value)
+    await fetchFiles(parentId.value)
 })
 </script>
 
 <template>
 <div class="explorer">
+    <folder-modal ref="folderModalRef" :selected-ids="selectedIds" type="保存" :token="token"
+                  @close="onFolderModalClose"/>
     <n-flex class="action" :wrap="false" align="center">
         <n-button secondary type="info" :disabled="!parentId" @click="handleClickBack" circle>
             <template #icon><img class="arrow" src="@/assets/images/arrow-left.png" alt=""></template>

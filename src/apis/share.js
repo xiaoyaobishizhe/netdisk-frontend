@@ -69,6 +69,18 @@ async function list(token, parentId) {
     return data.data.files
 }
 
+async function save(token, ids, parentId) {
+    await http.post("/share/save", {
+        token,
+        ids,
+        parentId
+    }, {
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+        }
+    })
+}
+
 export {
     listShares,
     create,
@@ -76,5 +88,6 @@ export {
     link,
     getUserId,
     getAccessToken,
-    list
+    list,
+    save
 }

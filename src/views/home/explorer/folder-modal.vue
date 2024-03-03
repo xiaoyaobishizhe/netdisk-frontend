@@ -1,10 +1,11 @@
 <script setup>
-import {fileApi} from "@/apis/index.js"
+import {fileApi, shareApi} from "@/apis/index.js"
 
 const props = defineProps({
-    // 模态框的类型，值为“复制”或“移动”
+    // 模态框的类型，值为“复制”、“移动”或“保存”
     type: {type: String, required: true},
-    selectedIds: {type: Array, required: true}
+    selectedIds: {type: Array, required: true},
+    token: {type: String, required: false},
 })
 const emits = defineEmits(["close"])
 const show = ref(false)       // 是否显示模态框
@@ -29,8 +30,10 @@ async function handleClickFolder(id, name) {
 async function handleClickConfirm() {
     if (props.type === "复制") {
         await fileApi.copy(props.selectedIds.join(","), parentId.value)
-    } else {
+    } else if (props.type === "移动") {
         await fileApi.move(props.selectedIds.join(","), parentId.value)
+    } else if (props.type === "保存") {
+        await shareApi.save(props.token, props.selectedIds.join(","), parentId.value)
     }
     show.value = false
 }
