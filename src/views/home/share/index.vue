@@ -8,7 +8,7 @@ const columns = [
     {title: "分享名称", key: "name"},
     // {title: '大小', key: 'size'},
     {title: '分享时间', key: 'createTime'},
-    // {title: '有效时间', key: 'timeout'}
+    {title: '状态', key: 'status'}
 ]
 const shares = ref([])            // 所有的分享
 const selectedIds = ref([])       // 已选择的分享

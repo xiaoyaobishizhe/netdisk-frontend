@@ -1,5 +1,6 @@
 <script setup>
 import {shareApi} from "@/apis/index.js"
+import {useClipboard} from "@vueuse/core"
 
 const props = defineProps({
     selectedIds: {type: Array, required: true}
@@ -11,10 +12,17 @@ const password = ref("")         // 用户输入的提取码
 const autoPassword = ref(true)   // 是否随机生成提取码
 const contentType = ref("选项")   // 模态框里内容的类型，值为“选项”或“分享”
 const link = ref("")             // 分享链接
+const {copy} = useClipboard()
+const showCopySuccess = ref(false)
 
 async function handleClickShare() {
     link.value = await shareApi.create(name.value, password.value, timeout.value, props.selectedIds.join(","))
     contentType.value = "分享"
+}
+
+function handleClickCopy() {
+    copy(link.value)
+    showCopySuccess.value = true
 }
 
 watch(panelShow, (value) => {
@@ -74,12 +82,43 @@ defineExpose({
             <n-button type="info" round @click="handleClickShare">创建链接</n-button>
         </n-flex>
         <n-flex v-else-if="contentType === '分享'" class="share" vertical>
-            {{link}}
+            <n-input v-model:value="link" type="text" readonly/>
+            <n-button type="info" round @click="handleClickCopy">复制链接</n-button>
+            <span v-show="showCopySuccess">复制链接成功</span>
         </n-flex>
     </n-card>
 </n-modal>
 </template>
 
 <style scoped lang="scss">
+.panel {
+    width: 720px;
+    border-radius: 12px;
 
+    .folder-list {
+        height: 320px;
+
+        .path {
+            height: 40px;
+            background-color: #fafafc;
+            font-size: 12px;
+        }
+
+        .folder {
+            height: 50px;
+            font-size: 12px;
+            color: #03081a;
+            user-select: none;
+            cursor: pointer;
+
+            &:hover {
+                background-color: #f7f9fc;
+            }
+
+            img {
+                height: 40px;
+            }
+        }
+    }
+}
 </style>
