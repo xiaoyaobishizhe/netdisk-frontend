@@ -51,7 +51,7 @@ router.beforeEach((to, from) => {
         if (token) {
             return true
         } else {
-            return `/share/init?code=${to.params.code}`
+            return `/share/init?code=${to.params.code}${("pwd" in to.query) ? "&pwd=" + to.query.pwd : ""}`
         }
     }
 

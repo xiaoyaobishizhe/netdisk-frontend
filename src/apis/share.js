@@ -59,11 +59,22 @@ async function getAccessToken(code, password) {
     return data.data
 }
 
+async function list(token, parentId) {
+    const data = await http.get("/share/list", {
+        params: {
+            token,
+            parentId
+        }
+    })
+    return data.data.files
+}
+
 export {
     listShares,
     create,
     deleteShares,
     link,
     getUserId,
-    getAccessToken
+    getAccessToken,
+    list
 }

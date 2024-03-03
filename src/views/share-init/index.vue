@@ -12,7 +12,7 @@ const nickname = ref("")
 async function handleClickTakeFile() {
     const token = await shareApi.getAccessToken(code.value, pwd.value)
     localStorage.setItem(`access-token:${code.value}`, token)
-    router.push("/s/" + code.value)
+    await router.push("/s/" + code.value + (pwd.value === "" ? "" : "?pwd=" + pwd.value))
 }
 
 onMounted(async () => {

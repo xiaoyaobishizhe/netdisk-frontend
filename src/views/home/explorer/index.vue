@@ -160,7 +160,7 @@ onMounted(() => {
     <share-modal ref="shareModelRef" :selected-ids="selectedIds"/>
     <n-flex class="action" :wrap="false" align="center">
         <n-button secondary type="info" :disabled="!parentId" @click="back" circle>
-            <template #icon><img class="arrow" src="../../../assets/images/arrow-left.png" alt=""></template>
+            <template #icon><img class="arrow" src="@/assets/images/arrow-left.png" alt=""></template>
         </n-button>
         <div>
             <n-upload ref="uploadRef" :show-file-list="false" :custom-request="uploadFile">
