@@ -1,23 +1,25 @@
 <script setup>
 import {storeToRefs} from "pinia"
-import useUserStore from "@/stores/user"
+import useUserStore from "@/stores/user.js"
 
 const userStore = useUserStore()
 const {userInfo} = storeToRefs(userStore)
 
-userStore.fetchUserInfo()
+onMounted(() => {
+    userStore.fetchUserInfo()
+})
 </script>
 
 <template>
 <div class="header">
     <div class="header__banner">
-        <img class="icon" src="@/assets/images/icon.png" alt=""/>
+        <img class="icon" src="../../../assets/images/icon.png" alt=""/>
         <span class="title">逍遥云盘</span>
     </div>
     <div class="header__user">
         <div class="image"></div>
         <div class="nickname">{{userInfo.nickname}}</div>
-        <img class="down" src="@/assets/images/down.png" alt="">
+        <img class="down" src="../../../assets/images/down.png" alt="">
     </div>
 </div>
 </template>

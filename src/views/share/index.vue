@@ -2,6 +2,7 @@
 import {useRoute} from "vue-router"
 import {shareApi} from "@/apis"
 import FolderModal from "@/views/home/explorer/folder-modal.vue"
+import Header from "@/views/home/header/index.vue"
 
 const route = useRoute()
 const code = route.params.code
@@ -68,6 +69,7 @@ onMounted(async () => {
 </script>
 
 <template>
+<Header/>
 <div class="explorer">
     <folder-modal ref="folderModalRef" :selected-ids="selectedIds" type="保存" :token="token"
                   @close="onFolderModalClose"/>

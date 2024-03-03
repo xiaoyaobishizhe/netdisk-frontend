@@ -1,6 +1,7 @@
 <script setup>
 import {recycleBinApi} from "@/apis/index.js"
 
+const dialog = useDialog()
 const columns = [
     {type: "selection"},
     {title: "文件名", key: "name"},
@@ -39,25 +40,52 @@ function handleClickCancelSelect() {
 }
 
 async function handleClickReturn() {
-    await recycleBinApi.restore(selectedIds.value.join(","))
-    selectedIds.value = []
-    fetchFiles()
+    dialog.success({
+        showIcon: false,
+        title: "确认还原",
+        content: "确认还原选中的文件？",
+        positiveText: "确定",
+        negativeText: "取消",
+        onPositiveClick: async () => {
+            await recycleBinApi.restore(selectedIds.value.join(","))
+            selectedIds.value = []
+            await fetchFiles()
+        }
+    })
 }
 
 async function handleClickDelete() {
-    await recycleBinApi.remove(selectedIds.value.join(","))
-    selectedIds.value = []
-    fetchFiles()
+    dialog.success({
+        showIcon: false,
+        title: "彻底删除",
+        content: "文件删除后将无法恢复，您确认要彻底删除所选文件吗？",
+        positiveText: "确定",
+        negativeText: "取消",
+        onPositiveClick: async () => {
+            await recycleBinApi.remove(selectedIds.value.join(","))
+            selectedIds.value = []
+            await fetchFiles()
+        }
+    })
 }
 
 async function handleClickClear() {
-    await recycleBinApi.clear()
-    selectedIds.value = []
-    fetchFiles()
+    dialog.success({
+        showIcon: false,
+        title: "清空回收站",
+        content: "确认清空回收站？",
+        positiveText: "确定",
+        negativeText: "取消",
+        onPositiveClick: async () => {
+            await recycleBinApi.clear()
+            selectedIds.value = []
+            await fetchFiles()
+        }
+    })
 }
 
-onMounted(() => {
-    fetchFiles()
+onMounted(async () => {
+    await fetchFiles()
 })
 </script>
 

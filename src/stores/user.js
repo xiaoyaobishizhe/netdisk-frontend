@@ -7,7 +7,7 @@ export default defineStore("user", {
     }),
     actions: {
         async fetchUserInfo() {
-            this.userInfo = (await userApi.info()).data
+            this.userInfo = await userApi.info()
         }
     }
 })

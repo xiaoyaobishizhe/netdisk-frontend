@@ -1,5 +1,5 @@
 <script setup>
-import Header from "@/views/home/header.vue"
+import Header from "@/views/home/header/index.vue"
 import iconImg from "@/assets/images/icon.png"
 import RecycleBinImg from "@/assets/images/recycle-bin.png"
 import ShareImg from "@/assets/images/share.png"
