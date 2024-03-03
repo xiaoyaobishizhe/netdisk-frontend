@@ -29,8 +29,8 @@ async function deleteShares(ids) {
     })
 }
 
-async function link(id) {
-    const data = await http.get("/share/link", {
+async function linkInfo(id) {
+    const data = await http.get("/share/link-info", {
         params: {
             id
         }
@@ -85,7 +85,7 @@ export {
     listShares,
     create,
     deleteShares,
-    link,
+    linkInfo,
     getUserId,
     getAccessToken,
     list,

@@ -23,7 +23,8 @@ async function fetchFiles() {
 }
 
 async function handleClickCopy() {
-    link.value = await shareApi.link(selectedIds.value[0])
+    const linkInfo = await shareApi.linkInfo(selectedIds.value[0])
+    link.value = `http://${window.location.host}/s/${linkInfo.code}?pwd=${linkInfo.pwd}`
     copy(link.value)
     message.success("复制到剪切板了，粘贴给您的朋友吧~")
 }

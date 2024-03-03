@@ -16,7 +16,8 @@ const {copy} = useClipboard()
 const showCopySuccess = ref(false)
 
 async function handleClickShare() {
-    link.value = await shareApi.create(name.value, password.value, timeout.value, props.selectedIds.join(","))
+    const linkInfo = await shareApi.create(name.value, password.value, timeout.value, props.selectedIds.join(","))
+    link.value = `http://${window.location.host}/s/${linkInfo.code}?pwd=${linkInfo.pwd}`
     contentType.value = "分享"
 }
 

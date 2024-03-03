@@ -1,9 +1,10 @@
 <script setup>
-import {useRoute} from "vue-router"
+import {useRoute, useRouter} from "vue-router"
 import {shareApi} from "@/apis"
 import FolderModal from "@/views/home/explorer/folder-modal.vue"
 import Header from "@/views/home/header/index.vue"
 
+const router = useRouter()
 const route = useRoute()
 const code = route.params.code
 const token = localStorage.getItem(`access-token:${code}`)
@@ -63,6 +64,10 @@ async function onFolderModalClose() {
     await fetchFiles(parentId.value)
 }
 
+function handleClickBackHome() {
+    router.push("/home")
+}
+
 onMounted(async () => {
     await fetchFiles(parentId.value)
 })
@@ -72,7 +77,14 @@ onMounted(async () => {
 <div class="header">
     <Header/>
 </div>
-<div class="explorer">
+<n-flex v-if="files.length === 0" class="none" align="center" justify="center">
+    <n-empty description="分享的文件已被删除">
+        <template #extra>
+            <n-button type="info" size="small" @click="handleClickBackHome">回到首页</n-button>
+        </template>
+    </n-empty>
+</n-flex>
+<div v-else class="explorer">
     <folder-modal ref="folderModalRef" :selected-ids="selectedIds" type="保存" :token="token"
                   @close="onFolderModalClose"/>
     <n-flex class="action" :wrap="false" align="center">
@@ -111,10 +123,16 @@ onMounted(async () => {
 </template>
 
 <style scoped lang="scss">
+$header-height: 56px;
+
 .header {
-    height: 56px;
+    height: $header-height;
     width: 100vw;
     box-shadow: 0 2px 6px 0 rgba(0, 0, 0, .05);
+}
+
+.none {
+    height: calc(100vh - #{$header-height});
 }
 
 .explorer {
