@@ -69,7 +69,9 @@ onMounted(async () => {
 </script>
 
 <template>
-<Header/>
+<div class="header">
+    <Header/>
+</div>
 <div class="explorer">
     <folder-modal ref="folderModalRef" :selected-ids="selectedIds" type="保存" :token="token"
                   @close="onFolderModalClose"/>
@@ -109,6 +111,12 @@ onMounted(async () => {
 </template>
 
 <style scoped lang="scss">
+.header {
+    height: 56px;
+    width: 100vw;
+    box-shadow: 0 2px 6px 0 rgba(0, 0, 0, .05);
+}
+
 .explorer {
     height: 100%;
     width: 100%;

@@ -1,9 +1,15 @@
 <script setup>
 import {storeToRefs} from "pinia"
 import useUserStore from "@/stores/user.js"
+import {useRouter} from "vue-router"
 
+const router = useRouter()
 const userStore = useUserStore()
 const {userInfo} = storeToRefs(userStore)
+
+function handleClickLogo() {
+    router.push("/home")
+}
 
 onMounted(() => {
     userStore.fetchUserInfo()
@@ -12,7 +18,7 @@ onMounted(() => {
 
 <template>
 <div class="header">
-    <div class="header__banner">
+    <div class="header__banner" @click="handleClickLogo">
         <img class="icon" src="../../../assets/images/icon.png" alt=""/>
         <span class="title">逍遥云盘</span>
     </div>
@@ -32,6 +38,7 @@ onMounted(() => {
     justify-content: space-between;
     height: 100%;
     padding: 0 1em;
+    cursor: pointer;
 
     &__banner {
         display: flex;
