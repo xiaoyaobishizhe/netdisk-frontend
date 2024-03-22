@@ -1,9 +1,10 @@
 <script setup>
-import {fileApi, shareApi} from "@/apis/index.js"
+import {fileApi} from "@/apis/index.js"
 import {fileToMd5} from "@/utils/file/index.js"
 import {NInput} from "naive-ui"
 import ShareModal from "@/views/home/explorer/share-modal.vue"
 import FolderModal from "@/views/home/explorer/folder-modal.vue"
+import axios from "axios"
 
 const dialog = useDialog()
 const parentIds = ref([])
@@ -24,10 +25,34 @@ async function fetchFiles(parentId) {
 
 async function handleClickResource(id, name) {
     for (const file of files.value) {
-        if (file.id === id && file.folder) {
-            parentIds.value.push(id)
-            folderPaths.value.push(name)
-            await fetchFiles(parentId.value)
+        if (file.id === id) {
+            if (file.folder) {
+                parentIds.value.push(id)
+                folderPaths.value.push(name)
+                await fetchFiles(parentId.value)
+            } else {
+                // 下载文件
+                const data = await fileApi.download(id)
+                const response = await axios.get(data.url, {
+                    responseType: 'blob', // 表明返回的数据是二进制数据
+                });
+                // 创建一个 Blob 对象
+                const blob = new Blob([response.data]);
+                // 创建一个临时的 <a> 元素
+                const link = document.createElement('a');
+                // 设置链接地址为 Blob 对象的URL
+                link.href = window.URL.createObjectURL(blob);
+                // 设置下载文件的名称
+                link.setAttribute('download', data.filename);
+                // 隐藏元素
+                link.style.display = 'none';
+                // 将链接添加到DOM中
+                document.body.appendChild(link);
+                // 模拟点击链接进行下载
+                link.click();
+                // 清理临时链接
+                document.body.removeChild(link);
+            }
             break
         }
     }

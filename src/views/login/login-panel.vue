@@ -42,9 +42,9 @@ const login = () => {
         </n-form-item>
         <div class="panel__submit">
             <n-button class="panel__login" type="info" round size="large" @click="login">登录</n-button>
-            <n-button class="panel__register" type="info" round size="large" @click="$emit('register')">
-                注册
-            </n-button>
+<!--            <n-button class="panel__register" type="info" round size="large" @click="$emit('register')">-->
+<!--                注册-->
+<!--            </n-button>-->
         </div>
     </n-form>
 </div>

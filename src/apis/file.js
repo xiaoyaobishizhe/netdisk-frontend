@@ -153,6 +153,17 @@ async function rename(id, name) {
     })
 }
 
+async function download(id) {
+    const data = await http.post("/file/download", {
+        id
+    }, {
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+        }
+    })
+    return data.data
+}
+
 export {
     sharding,
     applyUploadChunk,
@@ -165,5 +176,6 @@ export {
     copy,
     move,
     deleteFile,
-    rename
+    rename,
+    download
 }
